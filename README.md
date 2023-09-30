@@ -1,2 +1,62 @@
 # Blockchian_autoupdate_excelsheet
-Powered Blockchain Ledger: Revolutionizing Shop Transactions with Automated Excel Updates
+# Powered Blockchain Ledger: Revolutionizing Shop Transactions with Automated Excel Updates
+
+import hashlib
+import json
+import time
+import pandas as pd
+
+class Block:
+    def __init__(self, index, previous_hash, transactions, timestamp=None):
+        self.index = index
+        self.previous_hash = previous_hash
+        self.transactions = transactions
+        self.timestamp = timestamp or time.time()
+        self.hash = self.calculate_hash()
+
+    def calculate_hash(self):
+        block_string = json.dumps({
+            "index": self.index,
+            "previous_hash": self.previous_hash,
+            "transactions": self.transactions,
+            "timestamp": self.timestamp
+        }, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
+
+class Blockchain:
+    def __init__(self):
+        self.chain = []
+        self.create_genesis_block()
+
+    def create_genesis_block(self):
+        # Create the genesis block
+        genesis_block = Block(0, "0", [], time.time())
+        self.chain.append(genesis_block)
+
+    def add_block(self, transactions):
+        previous_block = self.chain[-1]
+        new_block = Block(len(self.chain), previous_block.hash, transactions)
+        self.chain.append(new_block)
+
+def update_excel(transactions):
+    # Update the Excel file with transactions
+    # For simplicity, let's just print the transactions here
+    print("Updating Excel with transactions:", transactions)
+
+# Example usage
+if __name__ == "__main__":
+    # Initialize the blockchain
+    blockchain = Blockchain()
+
+    # Simulate some transactions
+    transactions1 = ["Alice pays Bob $50", "Bob pays Charlie $30"]
+    blockchain.add_block(transactions1)
+    update_excel(transactions1)
+
+    transactions2 = ["Alice pays David $20", "Charlie pays Alice $10"]
+    blockchain.add_block(transactions2)
+    update_excel(transactions2)
+
+    # Print the blockchain
+    for block in blockchain.chain:
+        print(f"Block {block.index} - Hash: {block.hash}")
